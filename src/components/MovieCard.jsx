@@ -33,23 +33,33 @@ function MovieCard({ movie, darkMode }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showModal]);
 
-  const handleWatchTrailer = async (title, year) => {
-    const YOUTUBE_API_KEY = import.meta.env.VITE_REACT_APP_YOUTUBE_API_KEY;
-    try {
-      const query = encodeURIComponent(`${title} ${year} official trailer`);
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${YOUTUBE_API_KEY}&type=video&maxResults=1`
-      );
-      const data = await response.json();
-      if (data.items && data.items.length > 0) {
-        const videoId = data.items[0].id.videoId;
-        window.open(`https://www.youtube.com/watch?v=${videoId}`, "_blank");
-      } else alert("No trailer found.");
-    } catch (err) {
-      console.error(err);
-      alert("Unable to load trailer.");
+const handleWatchTrailer = async (title, year) => {
+  const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
+
+  if (!YOUTUBE_API_KEY) {
+    alert("YouTube API key is missing. Please configure it in Netlify environment variables.");
+    return;
+  }
+
+  try {
+    const query = encodeURIComponent(`${title} ${year} official trailer`);
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${YOUTUBE_API_KEY}&type=video&maxResults=1`
+    );
+
+    const data = await response.json();
+
+    if (data?.items?.length > 0) {
+      const videoId = data.items[0].id.videoId;
+      window.open(`https://www.youtube.com/watch?v=${videoId}`, "_blank");
+    } else {
+      alert("No trailer found for this movie.");
     }
-  };
+  } catch (err) {
+    console.error("Error fetching trailer:", err);
+    alert("Unable to load trailer. Please try again later.");
+  }
+};
 
   return (
     <>
