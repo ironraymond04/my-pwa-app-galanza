@@ -34,7 +34,7 @@ function MovieCard({ movie, darkMode }) {
   }, [showModal]);
 
   const handleWatchTrailer = async (title, year) => {
-    const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
+    const YOUTUBE_API_KEY = import.meta.env.VITE_REACT_APP_YOUTUBE_API_KEY;
     try {
       const query = encodeURIComponent(`${title} ${year} official trailer`);
       const response = await fetch(
