@@ -29,35 +29,26 @@ function MovieCard({ movie, darkMode }) {
     };
     if (showModal) document.addEventListener("mousedown", handleClickOutside);
     else document.removeEventListener("mousedown", handleClickOutside);
-
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showModal]);
 
 const handleWatchTrailer = async (title, year) => {
   const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
-
-  if (!YOUTUBE_API_KEY) {
-    alert("YouTube API key is missing. Please configure it in Netlify environment variables.");
-    return;
-  }
-
   try {
     const query = encodeURIComponent(`${title} ${year} official trailer`);
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${YOUTUBE_API_KEY}&type=video&maxResults=1`
     );
-
     const data = await response.json();
-
-    if (data?.items?.length > 0) {
+    if (data.items && data.items.length > 0) {
       const videoId = data.items[0].id.videoId;
       window.open(`https://www.youtube.com/watch?v=${videoId}`, "_blank");
     } else {
-      alert("No trailer found for this movie.");
+      alert("No trailer found.");
     }
   } catch (err) {
-    console.error("Error fetching trailer:", err);
-    alert("Unable to load trailer. Please try again later.");
+    console.error("YouTube API Error:", err);
+    alert("Unable to load trailer.");
   }
 };
 
@@ -65,7 +56,9 @@ const handleWatchTrailer = async (title, year) => {
     <>
       <div
         className={`shadow rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg ${
-          darkMode ? "bg-gray-800 text-gray-100 border border-gray-700" : "bg-white text-gray-800"
+          darkMode
+            ? "bg-gray-800 text-gray-100 border border-gray-700"
+            : "bg-white text-gray-800"
         }`}
       >
         <img
@@ -75,7 +68,9 @@ const handleWatchTrailer = async (title, year) => {
           onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
         />
         <h2 className="font-bold mt-3 text-lg">{movie.Title}</h2>
-        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>{movie.Year}</p>
+        <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+          {movie.Year}
+        </p>
         <button
           onClick={() => setShowModal(true)}
           className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer"
@@ -99,7 +94,9 @@ const handleWatchTrailer = async (title, year) => {
             <button
               onClick={() => setShowModal(false)}
               className={`absolute top-3 right-3 ${
-                darkMode ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                darkMode
+                  ? "text-gray-300 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
               } text-2xl cursor-pointer`}
             >
               &times;
@@ -109,7 +106,11 @@ const handleWatchTrailer = async (title, year) => {
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="w-full md:w-1/3 flex flex-col items-center">
                   <img
-                    src={details.Poster !== "N/A" ? details.Poster : "https://via.placeholder.com/200"}
+                    src={
+                      details.Poster !== "N/A"
+                        ? details.Poster
+                        : "https://via.placeholder.com/200"
+                    }
                     alt={details.Title}
                     className="w-full h-64 object-cover rounded-lg"
                     onError={(e) => (e.target.src = "https://via.placeholder.com/200")}
@@ -121,6 +122,7 @@ const handleWatchTrailer = async (title, year) => {
                     🎬 Watch Trailer
                   </button>
                 </div>
+
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-2">{details.Title}</h2>
                   <p className={`mb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
@@ -130,13 +132,16 @@ const handleWatchTrailer = async (title, year) => {
                     <span className="font-semibold">Genre:</span> {details.Genre || "N/A"}
                   </p>
                   <p className={`mb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    <span className="font-semibold">Released:</span> {details.Released || "N/A"}
+                    <span className="font-semibold">Released:</span>{" "}
+                    {details.Released || "N/A"}
                   </p>
                   <p className={`mb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    <span className="font-semibold">Cast:</span> {details.Actors || "N/A"}
+                    <span className="font-semibold">Cast:</span>{" "}
+                    {details.Actors || "N/A"}
                   </p>
                   <p className={`mt-3 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-                    <span className="font-semibold">Plot:</span> {details.Plot || "No plot available."}
+                    <span className="font-semibold">Plot:</span>{" "}
+                    {details.Plot || "No plot available."}
                   </p>
                   {details.Website && details.Website !== "N/A" && (
                     <a
@@ -151,7 +156,11 @@ const handleWatchTrailer = async (title, year) => {
                 </div>
               </div>
             ) : (
-              <p className={`text-center py-10 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+              <p
+                className={`text-center py-10 ${
+                  darkMode ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 Loading details...
               </p>
             )}
